@@ -1,0 +1,13 @@
+**/target/
+/out/
+!.idea/
+.idea/*
+!.idea/.gitignore
+!.idea/misc.xml
+!.idea/encodings.xml
+!.idea/runConfigurations/
+.idea/runConfigurations/*
+!.idea/runConfigurations/*.xml
+*.iml
+.vscode/
+.env
