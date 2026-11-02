@@ -7,8 +7,10 @@ import org.springframework.data.domain.*;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.annotation.Validated;
 
 @RestController
+@Validated
 @RequestMapping("/api/bookings")
 public class BookingController {
     public record BookingInput(@NotBlank String requestId, Long roomId, Long hotelId, boolean autoSelect, @NotNull LocalDate startDate, @NotNull LocalDate endDate) {}

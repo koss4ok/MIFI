@@ -11,4 +11,5 @@ public class User {
     @Column(nullable = false) public String role;
     protected User() {}
     User(String username, String password, String role) { this.username = username; this.password = password; this.role = role; }
+    public Long getId() { return id; }
 }

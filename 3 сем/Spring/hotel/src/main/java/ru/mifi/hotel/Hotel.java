@@ -10,4 +10,5 @@ public class Hotel {
     @Column(nullable = false) public String address;
     protected Hotel() {}
     Hotel(String name, String address) { this.name = name; this.address = address; }
+    public Long getId() { return id; }
 }

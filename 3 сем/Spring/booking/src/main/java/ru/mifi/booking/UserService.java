@@ -17,7 +17,8 @@ public class UserService {
     private final UserRepository users;
     private final PasswordEncoder passwords;
     private final JwtEncoder encoder;
-    UserService(UserRepository users, PasswordEncoder passwords, JwtEncoder encoder) { this.users = users; this.passwords = passwords; this.encoder = encoder; }
+    private final BookingRepository bookings;
+    UserService(UserRepository users, PasswordEncoder passwords, JwtEncoder encoder, BookingRepository bookings) { this.users = users; this.passwords = passwords; this.encoder = encoder; this.bookings = bookings; }
 
     @Transactional public UserDto create(String username, String password, String role) {
         if (!role.equals("USER") && !role.equals("ADMIN")) throw new ApiException(HttpStatus.BAD_REQUEST, "Неизвестная роль");
@@ -41,7 +42,11 @@ public class UserService {
         if (password != null && !password.isBlank()) user.password = passwords.encode(password);
         return dto(user);
     }
-    @Transactional public void delete(Long id) { users.delete(get(id)); }
+    @Transactional public void delete(Long id) {
+        User user = get(id);
+        if (bookings.existsByUserId(id)) throw new ApiException(HttpStatus.CONFLICT, "У пользователя есть история бронирований");
+        users.delete(user);
+    }
     User get(Long id) { return users.findById(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Пользователь не найден")); }
     private static UserDto dto(User user) { return new UserDto(user.id, user.username, user.role); }
 }

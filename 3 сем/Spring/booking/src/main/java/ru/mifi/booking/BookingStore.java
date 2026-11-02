@@ -48,7 +48,7 @@ public class BookingStore {
     }
     @Transactional public View cancel(String id, Long userId) {
         Booking b = locked(id);
-        if (!b.user.id.equals(userId)) throw new ApiException(HttpStatus.NOT_FOUND, "Бронирование не найдено");
+        if (!b.user.getId().equals(userId)) throw new ApiException(HttpStatus.NOT_FOUND, "Бронирование не найдено");
         if (b.status.equals("PENDING")) throw new ApiException(HttpStatus.CONFLICT, "Бронирование ещё обрабатывается");
         if (b.status.equals("CONFIRMED")) { b.status = "CANCELLED"; b.releasePending = true; }
         log.info("bookingId={} status={} releasePending={}", b.id, b.status, b.releasePending);
@@ -59,9 +59,9 @@ public class BookingStore {
     @Transactional(readOnly = true) public List<View> stalePending() { return bookings.findByStatusAndCreatedAtBefore("PENDING", Instant.now().minusSeconds(60)).stream().map(BookingStore::view).toList(); }
     private Booking owned(String id, Long userId) {
         Booking b = bookings.findById(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Бронирование не найдено"));
-        if (!b.user.id.equals(userId)) throw new ApiException(HttpStatus.NOT_FOUND, "Бронирование не найдено");
+        if (!b.user.getId().equals(userId)) throw new ApiException(HttpStatus.NOT_FOUND, "Бронирование не найдено");
         return b;
     }
     private Booking locked(String id) { return bookings.lockById(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Бронирование не найдено")); }
-    private static View view(Booking b) { return new View(b.id, b.requestId, b.user.id, b.roomId, b.startDate, b.endDate, b.status, b.createdAt, b.releasePending, b.autoSelect, b.requestedHotelId); }
+    private static View view(Booking b) { return new View(b.id, b.requestId, b.user.getId(), b.roomId, b.startDate, b.endDate, b.status, b.createdAt, b.releasePending, b.autoSelect, b.requestedHotelId); }
 }
