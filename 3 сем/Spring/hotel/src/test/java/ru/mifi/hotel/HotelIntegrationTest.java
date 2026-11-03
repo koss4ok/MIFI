@@ -70,6 +70,8 @@ class HotelIntegrationTest {
 
     @Test void securityProtectsAdminAndInternalEndpoints() throws Exception {
         mvc.perform(get("/api/hotels")).andExpect(status().isUnauthorized());
+        mvc.perform(get("/api/rooms/1").with(jwt().authorities(new SimpleGrantedAuthority("SCOPE_USER"))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.hotel.id").value(1));
         mvc.perform(post("/api/hotels").with(jwt().authorities(new SimpleGrantedAuthority("SCOPE_USER")))
                 .contentType(MediaType.APPLICATION_JSON).content("{\"name\":\"Hotel\",\"address\":\"Moscow\"}"))
                 .andExpect(status().isForbidden());

@@ -16,6 +16,8 @@ public class HotelService {
     HotelService(HotelRepository hotels, RoomRepository rooms, SlotRepository slots) { this.hotels = hotels; this.rooms = rooms; this.slots = slots; }
 
     @Transactional(readOnly = true) public List<Hotel> hotels() { return hotels.findAll(); }
+    @Transactional(readOnly = true) public Hotel getHotel(Long id) { return hotel(id); }
+    @Transactional(readOnly = true) public Room getRoom(Long id) { return room(id); }
     @Transactional public Hotel createHotel(String name, String address) { return hotels.save(new Hotel(name, address)); }
     @Transactional public Hotel updateHotel(Long id, String name, String address) { Hotel h = hotel(id); h.name = name; h.address = address; return h; }
     @Transactional public void deleteHotel(Long id) {

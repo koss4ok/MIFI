@@ -17,6 +17,7 @@ public class HotelController {
     HotelController(HotelService service) { this.service = service; }
 
     @GetMapping("/hotels") public List<Hotel> hotels() { return service.hotels(); }
+    @GetMapping("/hotels/{id}") public Hotel hotel(@PathVariable Long id) { return service.getHotel(id); }
     @PostMapping("/hotels") @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public Hotel createHotel(@Valid @RequestBody HotelInput input) { return service.createHotel(input.name(), input.address()); }
     @PutMapping("/hotels/{id}") @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
@@ -39,4 +40,5 @@ public class HotelController {
                                 @RequestParam(required = false) Long hotelId) { return service.available(startDate, endDate, hotelId, true); }
     @GetMapping("/rooms/statistics") @PreAuthorize("hasAuthority('SCOPE_ADMIN')")
     public List<Room> statistics() { return service.statistics(); }
+    @GetMapping("/rooms/{id}") public Room room(@PathVariable Long id) { return service.getRoom(id); }
 }

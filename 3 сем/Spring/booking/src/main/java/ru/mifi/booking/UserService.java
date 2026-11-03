@@ -43,7 +43,7 @@ public class UserService {
         return dto(user);
     }
     @Transactional public void delete(Long id) {
-        User user = get(id);
+        User user = users.lockById(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
         if (bookings.existsByUserId(id)) throw new ApiException(HttpStatus.CONFLICT, "У пользователя есть история бронирований");
         users.delete(user);
     }

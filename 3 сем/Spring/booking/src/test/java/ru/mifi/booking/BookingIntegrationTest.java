@@ -40,6 +40,9 @@ class BookingIntegrationTest {
         var second = service.create(userId, input);
         assertThat(first.status()).isEqualTo("CONFIRMED");
         assertThat(second.id()).isEqualTo(first.id());
+        Long other = users.create("other" + UUID.randomUUID(), "password", "USER").id();
+        assertThatThrownBy(() -> store.get(first.id(), other)).isInstanceOf(ApiException.class)
+                .satisfies(e -> assertThat(((ApiException) e).status()).isEqualTo(HttpStatus.NOT_FOUND));
         verify(hotel, times(1)).confirm(any());
         assertThatThrownBy(() -> service.create(userId, new BookingService.Request(input.requestId(), 11L, null, false, input.startDate(), input.endDate())))
                 .isInstanceOf(ApiException.class);
