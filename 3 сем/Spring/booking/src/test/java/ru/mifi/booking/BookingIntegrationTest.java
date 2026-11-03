@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,20 @@ class BookingIntegrationTest {
         assertThat(store.byRequest(input.requestId(), userId).releasePending()).isTrue();
         service.recover();
         assertThat(store.byRequest(input.requestId(), userId).releasePending()).isFalse();
+    }
+
+    @Test void duplicateAutoSelectionReturnsBookingEvenWhenLastRoomWasTaken() {
+        Long userId = users.create("duplicate" + UUID.randomUUID(), "password", "USER").id();
+        var input = new BookingService.Request(UUID.randomUUID().toString(), null, 1L, true,
+                LocalDate.now().plusDays(2), LocalDate.now().plusDays(3));
+        when(hotel.recommend(any(), any(), any())).thenAnswer(invocation -> {
+            store.create(userId, input.requestId(), 10L, input.startDate(), input.endDate(), true, input.hotelId());
+            return List.of();
+        });
+        var result = service.create(userId, input);
+        assertThat(result.status()).isEqualTo("PENDING");
+        assertThat(result.roomId()).isEqualTo(10L);
+        verify(hotel, never()).confirm(any());
     }
 
     @Test void loginJwtAndAuthorizationWorkOverHttp() throws Exception {
